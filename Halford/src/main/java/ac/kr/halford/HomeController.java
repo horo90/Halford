@@ -53,7 +53,7 @@ public class HomeController {
 		
 		loginService.join(member);
 		
-		return home(model);
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
@@ -62,10 +62,18 @@ public class HomeController {
 		
 		if (loginService.login(member) != null) {
 			logger.info("loing success");
-			return "board/board";
+			
+			return "redirect:/boardPage.do";
 		} else {
 			logger.info("login failed");
-			return home(model);
+			return "redirect:/";
 		}
+	}
+	
+	@RequestMapping(value = "/boardPage.do", method={RequestMethod.GET, RequestMethod.POST})
+	public String boardPage (HttpServletRequest reqeust, Model model) {
+		logger.info("boardPage");
+		
+		return "board/board";
 	}
 }
