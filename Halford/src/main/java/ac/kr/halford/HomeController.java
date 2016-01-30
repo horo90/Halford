@@ -1,15 +1,19 @@
 package ac.kr.halford;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
+import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import ac.kr.halford.model.MemberModel;
+import ac.kr.halford.service.LoginService;
 
 /**
  * Handles requests for the application home page.
@@ -19,21 +23,49 @@ public class HomeController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-		logger.info("Welcome home! The client locale is {}.", locale);
+	@Autowired
+	private LoginService loginService;
+	
+	@RequestMapping(value = "/", method = {RequestMethod.GET, RequestMethod.POST})
+	public String home(Model model) {
+		logger.info("main page");
 		
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-		
-		String formattedDate = dateFormat.format(date);
-		
-		model.addAttribute("serverTime", formattedDate );
+		MemberModel member = new MemberModel();
+		model.addAttribute("member", member);
 		
 		return "home";
 	}
 	
+	@RequestMapping(value = "/joinPage.do", method = {RequestMethod.GET, RequestMethod.POST})
+	public String joinPage (HttpServletRequest request, Model model) {
+		logger.info("join page");
+		
+		MemberModel member = new MemberModel();
+		
+		model.addAttribute("member", member);
+		
+		return "join/join";
+	}
+	
+	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
+	public String join (@ModelAttribute MemberModel member, HttpServletRequest request, Model model) {
+		logger.info("join process");
+		
+		loginService.join(member);
+		
+		return home(model);
+	}
+	
+	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
+	public String login (@ModelAttribute MemberModel member, HttpServletRequest request, Model model) {
+		logger.info("login process");
+		
+		if (loginService.login(member) != null) {
+			logger.info("loing success");
+			return "board/board";
+		} else {
+			logger.info("login failed");
+			return home(model);
+		}
+	}
 }

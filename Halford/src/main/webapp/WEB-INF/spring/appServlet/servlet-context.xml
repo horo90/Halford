@@ -23,6 +23,15 @@
 	
 	<context:component-scan base-package="ac.kr.halford" />
 	
-	
+	<interceptors>
+		<interceptor>
+			<mapping path="/**"/>
+			<mapping path="/**/*"/>
+			<exclude-mapping path="/join*"/>
+			<exclude-mapping path="/login*"/>
+			<exclude-mapping path="/"/>
+			<beans:bean class="ac.kr.halford.interceptor.SessionInterceptor"></beans:bean>
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>
