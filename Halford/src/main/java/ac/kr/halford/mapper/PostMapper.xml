@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ac.kr.halford.mapper.PostMapper">
+	<resultMap type="ac.kr.halford.model.PostModel" id="PostResult">
+		<id property="postId" column="post_id"/>
+		<result property="parentPostId" column="parent_post_id"/>
+		<result property="memberId" column="member_id"/>
+		<result property="title" column="title"/>
+		<result property="contents" column="contents"/>
+		<result property="date" column="post_date"/>
+	</resultMap>
+
+	<!-- Insert -->
+	<insert id="addPost" parameterType="ac.kr.halford.model.PostModel">
+		INSERT INTO post (member_id, title, contents, post_date) VALUES (#{memberId}, #{title}, #{contents}, #{date})
+	</insert>
+	
+	<!-- Delete -->
+	<delete id="deleteCertainPost" parameterType="ac.kr.halford.model.PostModel">
+		DELETE FROM post WHERE post_id=#{postId}
+	</delete>
+	
+	<!-- Update -->
+	<update id="updateCertainPost" parameterType="ac.kr.halford.model.PostModel">
+		UPDATE post SET title=#{title}, contents=#{contents}, post_date=#{date} WHERE post_id=#{postId}
+	</update>
+	
+	<!-- Select -->
+	<select id="findCertainPost" parameterType="ac.kr.halford.model.PostModel" resultMap="PostResult">
+		SELECT post_id, member_id, title, contents, post_date FROM post WHERE post_id=#{postId}
+	</select>
+	
+	<select id="findPosts" parameterType="java.util.Map" resultMap="PostResult">
+		SELECT post_id, member_id, title, contents, post_date FROM post ORDER BY post_id DESC LIMIT #{current}, 10
+	</select>
+	
+	<select id="getPostCount" resultType="int">
+		SELECT DISTINCT count(*) FROM post;
+	</select>
+	
+</mapper>

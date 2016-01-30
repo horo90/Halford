@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ac.kr.halford.mapper.LoginMapper">
+	<resultMap type="ac.kr.halford.model.MemberModel" id="MemberResult">
+		<id property="id" column="id"/>
+		<result property="password" column="password"/>
+	</resultMap>
+
+	<!-- Insert -->
+	<insert id="addMember" parameterType="ac.kr.halford.model.MemberModel">
+		INSERT INTO member (id, password) VALUES (#{id}, #{password})
+	</insert>
+	
+	<!-- Select -->
+	<select id="findMember" parameterType="ac.kr.halford.model.MemberModel" resultMap="MemberResult">
+		SELECT DISTINCT id, password FROM member WHERE id=#{id} AND password=#{password}
+	</select>
+</mapper>
