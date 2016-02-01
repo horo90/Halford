@@ -8,4 +8,7 @@
         <setting name="defaultExecutorType" value="REUSE" />
     </settings>
      
+    <plugins>
+		<plugin interceptor="ac.kr.halford.interceptor.SqlInterceptor"/>
+	</plugins>
 </configuration>

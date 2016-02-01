@@ -17,7 +17,7 @@
 	
 	<div class="container">
 		<div class="container-fluid" style="background-color:#F44336;color:#fff;height:100px;">
-			<h3>Halford</h3>
+			<h3>Detection SQL injection through removing attributes</h3>
 		</div>
 		<div class="page-header">
 			<span class="col-sm-4"></span>

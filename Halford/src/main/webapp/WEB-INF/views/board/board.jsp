@@ -25,7 +25,7 @@
 		</div>
 		
 		<div class="table-responsive">
-			<table class="table table-hover">
+			<table class="table table-hover" id="board-table">
 				<thead>
 					<tr>
 						<th>No.</th>
@@ -63,7 +63,16 @@
 									<li class="previous"><a href="./boardPage.do?current=${pager.currentPage-1 }"></a></li>
 								</c:if>
 								<c:forEach begin="${pager.startPage }" end="${pager.endPage }" var="i">
-									<li><a href="./boardPage.do?current=${i }">${i }</a></li>
+									<li>
+										<c:choose>
+											<c:when test="${pager.currentPage == i }">
+												<a>${i }</a>
+											</c:when>
+											<c:otherwise>
+												<a href="./boardPage.do?current=${i }">${i }</a>
+											</c:otherwise>
+										</c:choose>
+									</li>
 								</c:forEach>
 								<c:if test="${pager.hasPost }">
 									<li class="post"><a href="./boardPage.do?current=${pager.currentPage+1 }"></a></li>
