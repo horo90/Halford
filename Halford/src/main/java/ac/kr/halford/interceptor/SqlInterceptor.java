@@ -107,7 +107,6 @@ public class SqlInterceptor implements Interceptor {
 	private boolean removeAttributes(String FQ, String DQ) {
 		
 		String stringReg = "=\\s*'([^']*)'";
-//		String stringReg = "=\\s*'.*'";
 		String numberReg = "=\\s*[+-]?(\\d*)(\\.\\d*)?";
 		String likeReg = "(?i)like\\s*'([^']*)'";
 		String limitReg = "(?i)limit\\s*(\\d*),\\s*(\\d*)";
