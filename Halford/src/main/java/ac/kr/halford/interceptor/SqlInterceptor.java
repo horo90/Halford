@@ -106,11 +106,13 @@ public class SqlInterceptor implements Interceptor {
 	
 	private boolean removeAttributes(String FQ, String DQ) {
 		
-		String stringReg = "=\\s*'([^']+)'";
+		String stringReg = "=\\s*'([^']*)'";
 //		String stringReg = "=\\s*'.*'";
 		String numberReg = "=\\s*[+-]?(\\d*)(\\.\\d*)?";
-		String likeReg = "(?i)like\\s*'([^']+)'";
+		String likeReg = "(?i)like\\s*'([^']*)'";
 		String limitReg = "(?i)limit\\s*(\\d*),\\s*(\\d*)";
+		String quotesReg = "'([^']*)'";
+		String NumEqNumReg = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
 		String reg = stringReg + "|" + numberReg;
 		
 		logger.info("fq : {}", FQ);
@@ -120,6 +122,8 @@ public class SqlInterceptor implements Interceptor {
 		Fdq = Fdq.replaceAll(limitReg, "limit , ");
 		String Ddq = DQ.replaceAll(reg, "=");
 		Ddq = Ddq.replaceAll(likeReg, "like ");
+		Ddq = Ddq.replaceAll(quotesReg, "");
+		Ddq = Ddq.replaceAll(NumEqNumReg, "=");
 		Ddq = Ddq.replaceAll(limitReg, "limit , ");
 //		String DDQ = DQ.replaceAll(stringReg, "=''");
 //		DDQ = DDQ.replaceAll(numberReg, "=");
