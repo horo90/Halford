@@ -35,10 +35,11 @@ public class SqlInterceptor implements Interceptor {
 		MappedStatement ms       = (MappedStatement)args[0];
 		Object          param    = (Object)args[1];
 		BoundSql        boundSql = ms.getBoundSql(param);
-		String dq = getFullSqlQuery(boundSql, param);
-		
-		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
-		else return new ArrayList<Object>();
+//		String dq = getFullSqlQuery(boundSql, param);
+//		
+//		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
+//		else return new ArrayList<Object>();
+		return invocation.proceed();
 		
 //		System.out.println("====================================");
 //		System.out.println(invocation.getMethod().getName());
@@ -70,8 +71,8 @@ public class SqlInterceptor implements Interceptor {
 	private String getFullSqlQuery (BoundSql boundSql, Object param) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String sql = boundSql.getSql();
 		
-		// ÇöÀç ¸ðµ¨ Å¬·¡½º³ª ¸Ê Çü½ÄÀÇ ¸Å°³º¯¼ö¸¦ ÀÌ¿ëÇÏ±â ¶§¹®¿¡ ÀÌ»óÀÌ ¾øÀ½.
-		// Á¤¼ö ÇÏ³ªÀÇ °æ¿ì ¸ðµç sql »ç¿ëÀÚ ÀÔ·ÂÀ» ´ëÀÔÇÏ´Â ·çÆ¾Àº ±¸Çö x
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ sql ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½Æ¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ x
 		if (param != null) {
 			if (param instanceof String) sql = sql.replaceFirst("\\?", "'"+param.toString()+"'");
 			else if (param instanceof Integer || param instanceof Long || param instanceof Float || param instanceof Double) sql = sql.replaceFirst("\\?", param.toString());
