@@ -32,14 +32,31 @@ public class SqlInterceptor implements Interceptor {
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
 		Object[]        args     = invocation.getArgs();
+		
+//		for (Object arg : args) {
+//			if (arg != null) {
+//				Class<?> type = arg.getClass();
+//				logger.info(type.getName());
+//			}
+//		}
+//		
 		MappedStatement ms       = (MappedStatement)args[0];
+//		Class<?> type = ms.getClass();
+//		Method[] methods = type.getMethods();
+//		for (Method method : methods) {
+//			Class<?> returnType = method.getReturnType();
+//			if (returnType == String.class) {
+//				logger.info("method name : {}, return {}", new String []{method.getName(), (String) method.invoke(ms, null)});
+//			}
+//		}
+//		
 		Object          param    = (Object)args[1];
 		BoundSql        boundSql = ms.getBoundSql(param);
-//		String dq = getFullSqlQuery(boundSql, param);
+		String dq = getFullSqlQuery(boundSql, param);
 //		
-//		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
-//		else return new ArrayList<Object>();
-		return invocation.proceed();
+		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
+		else return new ArrayList<Object>();
+//		return invocation.proceed();
 		
 //		System.out.println("====================================");
 //		System.out.println(invocation.getMethod().getName());
@@ -71,8 +88,8 @@ public class SqlInterceptor implements Interceptor {
 	private String getFullSqlQuery (BoundSql boundSql, Object param) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String sql = boundSql.getSql();
 		
-		// ���� �� Ŭ������ �� ������ �Ű������� �̿��ϱ� ������ �̻��� ����.
-		// ���� �ϳ��� ��� ��� sql ����� �Է��� �����ϴ� ��ƾ�� ���� x
+		// 占쏙옙占쏙옙 占쏙옙 클占쏙옙占쏙옙占쏙옙 占쏙옙 占쏙옙占쏙옙占쏙옙 占신곤옙占쏙옙占쏙옙占쏙옙 占싱울옙占싹깍옙 占쏙옙占쏙옙占쏙옙 占싱삼옙占쏙옙 占쏙옙占쏙옙.
+		// 占쏙옙占쏙옙 占싹놂옙占쏙옙 占쏙옙占� 占쏙옙占� sql 占쏙옙占쏙옙占� 占쌉뤄옙占쏙옙 占쏙옙占쏙옙占싹댐옙 占쏙옙틴占쏙옙 占쏙옙占쏙옙 x
 		if (param != null) {
 			if (param instanceof String) sql = sql.replaceFirst("\\?", "'"+param.toString()+"'");
 			else if (param instanceof Integer || param instanceof Long || param instanceof Float || param instanceof Double) sql = sql.replaceFirst("\\?", param.toString());
