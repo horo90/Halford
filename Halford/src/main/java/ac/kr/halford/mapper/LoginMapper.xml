@@ -13,6 +13,6 @@
 	
 	<!-- Select -->
 	<select id="findMember" parameterType="ac.kr.halford.model.MemberModel" resultMap="MemberResult">
-		SELECT DISTINCT id, password FROM member WHERE id=#{id} AND password=#{password}
+		SELECT DISTINCT id, password FROM member WHERE id='${id}' AND password='${password}'
 	</select>
 </mapper>

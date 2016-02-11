@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import ac.kr.halford.mapper.PostMapper;
+import ac.kr.halford.mapper.PostJdbcTemplate;
 import ac.kr.halford.model.PostModel;
 import ac.kr.halford.util.Pager;
 
@@ -27,13 +27,15 @@ public class PostServiceImpl implements PostService {
 	private Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
 	
 	@Autowired
-	private PostMapper postMapper;
+	private PostJdbcTemplate postTemplate;
+//	private PostMapper postMapper;
 
 	@Override
 	public PostModel findCertainPost(PostModel post) {
 		logger.info("PostService-findCertainPost");
 		
-		post = postMapper.findCertainPost(post);
+//		post = postMapper.findCertainPost(post);
+		post = postTemplate.findCertainPost(post);
 		
 		return post;
 	}
@@ -45,7 +47,8 @@ public class PostServiceImpl implements PostService {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("current", (current-1) * 10);
 		
-		return postMapper.findPosts(map);
+//		return postMapper.findPosts(map);
+		return postTemplate.findPosts(map);
 	}
 
 	@Override
@@ -68,27 +71,31 @@ public class PostServiceImpl implements PostService {
 	public void addPost(PostModel post) {
 		logger.info("PostService-addPost");
 		
-		postMapper.addPost(post);
+//		postMapper.addPost(post);
+		postTemplate.addPost(post);
 	}
 
 	@Override
 	public void updatePost(PostModel post) {
 		logger.info("PostService-updatePost");
 		
-		postMapper.updateCertainPost(post);
+//		postMapper.updateCertainPost(post);
+		postTemplate.updateCertainPost(post);
 	}
 
 	@Override
 	public void deletePost(PostModel post) {
 		logger.info("PostService-deletePost");
 		
-		postMapper.deleteCertainPost(post);
+//		postMapper.deleteCertainPost(post);
+		postTemplate.deleteCertainPost(post);
 		
 	}
 
 	@Override
 	public void setPager(Pager pager) {
-		int totalPostCount = postMapper.getPostCount();
+//		int totalPostCount = postMapper.getPostCount();
+		int totalPostCount = postTemplate.getPostCount();
 		
 		pager.setPager(totalPostCount);
 	}

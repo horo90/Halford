@@ -1,21 +1,27 @@
 package ac.kr.halford.interceptor;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.ibatis.builder.StaticSqlSource;
+import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.scripting.defaults.RawSqlSource;
+import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -28,50 +34,45 @@ import org.slf4j.LoggerFactory;
 })
 public class SqlInterceptor implements Interceptor {
 	private Logger logger = LoggerFactory.getLogger(SqlInterceptor.class);
+	
 
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
 		Object[]        args     = invocation.getArgs();
-		
-//		for (Object arg : args) {
-//			if (arg != null) {
-//				Class<?> type = arg.getClass();
-//				logger.info(type.getName());
-//			}
-//		}
-//		
 		MappedStatement ms       = (MappedStatement)args[0];
-//		Class<?> type = ms.getClass();
-//		Method[] methods = type.getMethods();
-//		for (Method method : methods) {
-//			Class<?> returnType = method.getReturnType();
-//			if (returnType == String.class) {
-//				logger.info("method name : {}, return {}", new String []{method.getName(), (String) method.invoke(ms, null)});
-//			}
-//		}
-//		
 		Object          param    = (Object)args[1];
 		BoundSql        boundSql = ms.getBoundSql(param);
-		String dq = getFullSqlQuery(boundSql, param);
+		
+//		InputStream stream = null;
 //		
-		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
-		else return new ArrayList<Object>();
-//		return invocation.proceed();
+//		stream = Resources.getResourceAsStream("")
 		
-//		System.out.println("====================================");
-//		System.out.println(invocation.getMethod().getName());
-//		System.out.println(ms.getId());
+		
+		
+		SqlSource sqlSource = ms.getSqlSource(); 
+		if (sqlSource instanceof DynamicSqlSource) {
+			logger.info("dynamic");
+		} else if (sqlSource instanceof StaticSqlSource) {
+			logger.info("static");
+		} else if (sqlSource instanceof RawSqlSource) {
+			logger.info("raw");
+		} else if (sqlSource instanceof ProviderSqlSource) {
+			logger.info("provider");
+		}
+		logger.info("param size : {}", sqlSource.getBoundSql(param).getParameterMappings().size());
+		
+		
+		
+		logger.info(boundSql.getSql());
+		
+		
+		
+//		String dq = getFullSqlQuery(boundSql, param);
 //		System.out.println(boundSql.getSql());
-//		System.out.println(param);
-//		System.out.println(sql);
-//		System.out.println("====================================");
 		
-		
-		// if the sql is normal, return invocation.proceed.
-		
-		
-		// if function detect that the sql is abnormal, return empty ArrayList.
-//		return new ArrayList<Object>();
+//		if (removeAttributes(boundSql.getSql(), dq)) return invocation.proceed();  
+//		else return new ArrayList<Object>();
+		return invocation.proceed();
 	}
 
 	@Override
@@ -124,6 +125,8 @@ public class SqlInterceptor implements Interceptor {
 	
 	private boolean removeAttributes(String FQ, String DQ) {
 		
+		// 추가적으로 preparedstatement + bind variable을 사용할 경우, 이런식으로 만들면 소용이 없는 경우
+		// 이거 분명히 수정의 여지가 있음. 특히 'x' 잡는 것이 매우 불안.
 		String stringReg = "=\\s*'([^']*)'";
 		String numberReg = "=\\s*[+-]?(\\d*)(\\.\\d*)?";
 		String likeReg = "(?i)like\\s*'([^']*)'";
@@ -142,9 +145,6 @@ public class SqlInterceptor implements Interceptor {
 		Ddq = Ddq.replaceAll(quotesReg, "");
 		Ddq = Ddq.replaceAll(NumEqNumReg, "=");
 		Ddq = Ddq.replaceAll(limitReg, "limit , ");
-//		String DDQ = DQ.replaceAll(stringReg, "=''");
-//		DDQ = DDQ.replaceAll(numberReg, "=");
-//		DDQ = DDQ.replaceAll(likeReg, "like ''");
 		
 		logger.info("fdq : {}", Fdq);
 		logger.info("ddq : {}", Ddq);
@@ -154,12 +154,21 @@ public class SqlInterceptor implements Interceptor {
 		byte[] result = new byte[FdqBytes.length]; 
 		boolean check = false;
 		
-		for (int i = 0;i < FdqBytes.length;++i) {
-			result[i] = (byte)(FdqBytes[i] ^ DdqBytes[i]);
-			if (result[i] != 0x00) {
+		// 이렇게 하는게 빠른지, 그냥 string compare하는게 빠른지 잘 모르겠다.
+		// 간단하기로는 string compare가 간단함.
+		// byte 배열의 길이를 이용해도 가능.
+		for (int i = 0;;++i) {
+			if (i < FdqBytes.length && i < DdqBytes.length) {
+				result[i] = (byte)(FdqBytes[i] ^ DdqBytes[i]);
+				if (result[i] != 0x00) {
+					check = true;
+					break;
+				}
+			} else if (i >= FdqBytes.length && i < DdqBytes.length) {
 				check = true;
 				break;
-			}
+			} else break;
+			
 		}
 		
 		//	check true -> abnormal sql
