@@ -1,6 +1,6 @@
 package ac.kr.halford.model;
 
-public class MemberModel {
+public class MemberModel extends SuperModel {
 	private String id;
 	private String password;
 	

@@ -1,6 +1,9 @@
 package ac.kr.halford;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ac.kr.halford.model.MemberModel;
 import ac.kr.halford.model.PostModel;
@@ -68,16 +72,32 @@ public class HomeController {
 		return "redirect:/";
 	}
 	
+	// 나중에 문자열 모두 상수화 시켜야함.
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
-	public String login (@ModelAttribute MemberModel member, HttpServletRequest request, Model model) {
+	public String login (@ModelAttribute MemberModel member, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
 		logger.info("login process");
 		
-		if (loginService.login(member) != null) {
-			logger.info("loing success");
-			
-			return "redirect:/boardPage.do";
+		Map<String, Object> map = new HashMap<String, Object>();
+		member = loginService.login(member);
+		
+		if (member != null) {
+			if (!member.isEmpty()) {
+				logger.info("loing success");
+				map.put("isSqli", false);
+				redirectAttributes.addFlashAttribute("map", map);
+				return "redirect:/boardPage.do";
+			} else {
+				logger.info("login failed");
+				map.put("isSqli", false);
+				map.put("message", "해당 id와 password에 일치하는 정보가 없습니다.");
+				redirectAttributes.addFlashAttribute("map", map);
+				return "redirect:/";
+			}
 		} else {
-			logger.info("login failed");
+			logger.info("detecting sqli");
+			map.put("isSqli", true);
+			map.put("message", "SQL injection 공격이 감지되었습니다.");
+			redirectAttributes.addFlashAttribute("map", map);
 			return "redirect:/";
 		}
 	}
@@ -106,6 +126,7 @@ public class HomeController {
 		logger.info("pager : " + pager.toString());
 		
 		List<PostModel> postList = postService.findPosts(current);
+		
 		if (postList == null) logger.info("postList is null");
 		else logger.info("postList is not null");
 		request.setAttribute("postList", postList);
@@ -140,6 +161,21 @@ public class HomeController {
 						int postId = Integer.parseInt(request.getParameter("id"));
 						post.setPostId(postId);
 						post = postService.findCertainPost(post);
+						// sqli가 감지된 경우, null 넘어올 가능성 있음. 아직 처리 안됨.
+						// 임의로 이상한 값을 넣었을 때, 빈 객체가 넘어올 수 있음. 아직 처리 안됨.
+						if (post.isEmpty()) {
+							logger.info("empty");
+						}
+						
+//						if (post == null) {
+//							Map<String, Object> map = new HashMap<String, Object>();
+//							map.put("isSqli", true);
+//							map.put("message", "SQL injection 공격이 감지되었습니다.");
+//							post = new PostModel();
+//						} else if (post.isEmpty()) {
+//							logger.info("해당 게시물 x");
+//							post.setContents("해당하는 게시물이 없습니다.");
+//						}
 						logger.info(post.toString());
 					} else {
 						//	abnormal access

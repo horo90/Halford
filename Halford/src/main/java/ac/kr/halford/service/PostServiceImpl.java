@@ -27,7 +27,7 @@ public class PostServiceImpl implements PostService {
 	private Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
 	
 	@Autowired
-	private PostJdbcTemplate postTemplate;
+	private PostJdbcTemplate postJdbcTemplate;
 //	private PostMapper postMapper;
 
 	@Override
@@ -35,9 +35,9 @@ public class PostServiceImpl implements PostService {
 		logger.info("PostService-findCertainPost");
 		
 //		post = postMapper.findCertainPost(post);
-		post = postTemplate.findCertainPost(post);
+		return postJdbcTemplate.findCertainPost(post);
 		
-		return post;
+//		return post;
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
 		map.put("current", (current-1) * 10);
 		
 //		return postMapper.findPosts(map);
-		return postTemplate.findPosts(map);
+		return postJdbcTemplate.findPosts(map);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
 		logger.info("PostService-addPost");
 		
 //		postMapper.addPost(post);
-		postTemplate.addPost(post);
+		postJdbcTemplate.addPost(post);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class PostServiceImpl implements PostService {
 		logger.info("PostService-updatePost");
 		
 //		postMapper.updateCertainPost(post);
-		postTemplate.updateCertainPost(post);
+		postJdbcTemplate.updateCertainPost(post);
 	}
 
 	@Override
@@ -88,14 +88,14 @@ public class PostServiceImpl implements PostService {
 		logger.info("PostService-deletePost");
 		
 //		postMapper.deleteCertainPost(post);
-		postTemplate.deleteCertainPost(post);
+		postJdbcTemplate.deleteCertainPost(post);
 		
 	}
 
 	@Override
 	public void setPager(Pager pager) {
 //		int totalPostCount = postMapper.getPostCount();
-		int totalPostCount = postTemplate.getPostCount();
+		int totalPostCount = postJdbcTemplate.getPostCount();
 		
 		pager.setPager(totalPostCount);
 	}

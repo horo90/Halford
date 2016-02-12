@@ -1,6 +1,6 @@
 package ac.kr.halford.model;
 
-public class PostModel {
+public class PostModel extends SuperModel {
 	private int postId;
 	private int parentPostId;
 	private String memberId;

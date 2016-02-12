@@ -7,29 +7,28 @@ public class SqlInjectionFilter {
 	
 	private static Logger logger = LoggerFactory.getLogger(SqlInjectionFilter.class);
 
-	private final String stringFilter = "=\\s*'([^']*)'";
-	private final String numberFilter = "=\\s*[+-]?(\\d*)(\\.\\d*)?";
-	private final String likeFilter = "(?i)like\\s*'([^']*)'";
-	private final String limitFilter = "(?i)limit\\s*(\\d*),\\s*(\\d*)";
-	private final String quotesFilter = "'([^']*)'";
-	private final String NumEqNumFilter = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
+	private static final String stringFilter = "=\\s*'([^']*)'";
+	private static final String numberFilter = "=\\s*[+-]?(\\d*)(\\.\\d*)?";
+	private static final String likeFilter = "(?i)like\\s*'([^']*)'";
+	private static final String limitFilter = "(?i)limit\\s*(\\d*),\\s*(\\d*)";
+	private static final String quotesFilter = "'([^']*)'";
+	private static final String NumEqNumFilter = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
 	
+	// dq->ddq limit filter 오류
 	
 	public static boolean isSQLi (String FQ, String DQ) {
 		
 		logger.info("fq : {}", FQ);
 		logger.info("dq : {}", DQ);
 		
+		String Fdq = FQ.replaceAll("\\?", "");
+		Fdq = Fdq.replaceAll(limitFilter, "LIMIT , ");
 		
-//		String Fdq = FQ.replaceAll("\\?", "");
-//		Fdq = Fdq.replaceAll(limitReg, "limit , ");
-//		String Ddq = DQ.replaceAll(reg, "=");
-//		Ddq = Ddq.replaceAll(likeReg, "like ");
-//		Ddq = Ddq.replaceAll(quotesReg, "");
-//		Ddq = Ddq.replaceAll(NumEqNumReg, "=");
-//		Ddq = Ddq.replaceAll(limitReg, "limit , ");
-		
-//		String Fdq = FQ.replaceAll("\\?", "");
+		String Ddq = DQ.replaceAll(stringFilter + "|" + numberFilter, "=");
+		Ddq = Ddq.replaceAll(likeFilter, "LIKE ");
+		Ddq = Ddq.replaceAll(quotesFilter, "");									// 이거 때문에 조금 걸림.
+		Ddq = Ddq.replaceAll(NumEqNumFilter, "=");
+		Ddq = Ddq.replaceAll(limitFilter, "LIMIT , ");
 		
 		logger.info("fdq : {}", Fdq);
 		logger.info("ddq : {}", Ddq);
@@ -68,4 +67,20 @@ public class SqlInjectionFilter {
 		return true;
 	}
 	
+	public static String getBoundSql (String sql, Object[] params) {
+		
+		// params는 model class나 Map class에 있는 속성을 object 배열로 바꾸기 때문에 String or 숙자 계열 뿐이다.
+		// 이런식으로 하려면 굳이 Map이나 Model class를 사용할 필요는 없지만, mybatis 기반에서 바꾸다 보니 이런 형태가 됐다.
+		if (params.length > 0) {
+			for (Object value : params) {
+				if (value.getClass() == String.class) {
+					sql = sql.replaceFirst("\\?", "'"+value.toString()+"'");
+				} else {
+					sql = sql.replaceFirst("\\?", value.toString());
+				}
+			}
+		}
+		
+		return sql;
+	}
 }

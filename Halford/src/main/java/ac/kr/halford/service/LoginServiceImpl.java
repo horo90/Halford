@@ -20,14 +20,14 @@ public class LoginServiceImpl implements LoginService {
 	private Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 	
 	@Autowired
-	private LoginJdbcTemplate loginTemplate;
+	private LoginJdbcTemplate loginJdbcTemplate;
 //	private LoginMapper loginMapper;
 
 	@Override
 	public void join(MemberModel member) {
 		logger.info("LoginService-join");
 		
-		loginTemplate.addMember(member);
+		loginJdbcTemplate.addMember(member);
 //		loginMapper.addMember(member);
 	}
 
@@ -37,13 +37,16 @@ public class LoginServiceImpl implements LoginService {
 		logger.info(member.toString());
 		
 //		member = loginMapper.findMember(member);
-		member = loginTemplate.findMember(member);
+		member = loginJdbcTemplate.findMember(member);
 		
-		if (member != null) {
-			ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-			HttpSession session = attr.getRequest().getSession();
-			session.setAttribute("id", member.getId());
-		}
+		if (member != null) {	// 정상 쿼리
+			if (!member.isEmpty()) {
+				ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+				HttpSession session = attr.getRequest().getSession();
+				session.setAttribute("id", member.getId());
+			} else ;	// 정상적인 login 실패
+			
+		} else ;	//sqli
 		
 		return member;
 	}
