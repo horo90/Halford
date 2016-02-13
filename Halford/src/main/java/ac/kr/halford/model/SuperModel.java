@@ -1,7 +1,7 @@
 package ac.kr.halford.model;
 
 public class SuperModel {
-	private boolean isEmpty;
+	protected boolean isEmpty;
 
 	public SuperModel() {
 	}

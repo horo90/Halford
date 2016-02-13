@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import ac.kr.halford.mapper.LoginJdbcTemplate;
+import ac.kr.halford.dbtemplate.LoginJdbcTemplate;
 import ac.kr.halford.model.MemberModel;
 
 @Service("LoginService")
@@ -24,10 +24,10 @@ public class LoginServiceImpl implements LoginService {
 //	private LoginMapper loginMapper;
 
 	@Override
-	public void join(MemberModel member) {
+	public int join(MemberModel member) {
 		logger.info("LoginService-join");
 		
-		loginJdbcTemplate.addMember(member);
+		return loginJdbcTemplate.addMember(member);
 //		loginMapper.addMember(member);
 	}
 

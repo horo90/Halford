@@ -9,11 +9,11 @@ public interface PostService {
 	public PostModel findCertainPost(PostModel post);
 	public List<PostModel> findPosts(int current);
 	
-	public void addPost(PostModel post);
+	public int addPost(PostModel post);
 	
-	public void updatePost(PostModel post);
+	public int updatePost(PostModel post);
 	
-	public void deletePost(PostModel post);
+	public int deletePost(PostModel post);
 	
 	public void setPostModel(PostModel post);
 	public void setPager(Pager pager);

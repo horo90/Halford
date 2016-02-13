@@ -1,4 +1,4 @@
-package ac.kr.halford.mapper;
+package ac.kr.halford.dbtemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +12,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
+import ac.kr.halford.constants.PostSql;
+import ac.kr.halford.mapper.SqlInjectionFilter;
 import ac.kr.halford.model.PostModel;
 
 public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
@@ -20,42 +22,45 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 	
 
 	@Override
-	public void addPost(PostModel post) {
+	public int addPost(PostModel post) {
 		Object[] params = new Object[] {post.getMemberId(), post.getTitle(), post.getContents(), post.getDate()};
 		String fq = PostSql.addPost;
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
 		
 		logger.info(dq);
 		
-		if (SqlInjectionFilter.isSQLi(fq, dq)) {
+		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
 			this.getJdbcTemplate().update(dq);
-		}
+			return 0;
+		} else return 1;
 	}
 
 	@Override
-	public void deleteCertainPost(PostModel post) {
+	public int deleteCertainPost(PostModel post) {
 		Object[] params = new Object[] {post.getPostId()};
 		String fq = PostSql.deleteCertainPost;
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
 		
 		logger.info(dq);
 		
-		if (SqlInjectionFilter.isSQLi(fq, dq)) {
+		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
 			this.getJdbcTemplate().update(dq);
-		}
+			return 0;
+		} else return 1;
 	}
 
 	@Override
-	public void updateCertainPost(PostModel post) {
+	public int updateCertainPost(PostModel post) {
 		Object[] params = new Object[] {post.getTitle(), post.getContents(), post.getDate(), post.getPostId()};
 		String fq = PostSql.updateCertainPost;
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
 		
 		logger.info(dq);
 		
-		if (SqlInjectionFilter.isSQLi(fq, dq)) {
+		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
 			this.getJdbcTemplate().update(dq);
-		}
+			return 0;
+		} else return 1;
 	}
 
 	@Override
@@ -66,7 +71,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (SqlInjectionFilter.isSQLi(fq, dq)) {
+		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
 			try {
 				return this.getJdbcTemplate().queryForObject(dq,
 						new RowMapper<PostModel> () {
@@ -101,7 +106,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (SqlInjectionFilter.isSQLi(fq, dq)) {
+		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
 			try {
 				return this.getJdbcTemplate().query(dq, 
 						new RowMapper<PostModel> () {

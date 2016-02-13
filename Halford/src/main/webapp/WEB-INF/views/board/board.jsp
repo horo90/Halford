@@ -12,9 +12,22 @@
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#message-box").css("display", "none");
+		$("#message-box").slideDown();
+	});
+</script>
 </head>
 <body>
 	<div class="container">
+		<c:if test="${map ne null }">
+			<jsp:include page="../common/messageBox.jsp">
+				<jsp:param value="${map.message }" name="message"/>
+				<jsp:param value="${map.isSqli }" name="isSqli"/>
+			</jsp:include>
+		</c:if>
+	
 		<jsp:include page="../common/header.jsp" flush="false">
 			<jsp:param value="boardPage" name="page"/>
 		</jsp:include>

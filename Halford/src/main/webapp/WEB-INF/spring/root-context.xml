@@ -24,11 +24,11 @@
 		<property name="password" value="admin"></property>
 	</bean>
 	
-	<bean id="loginJdbcTemplate" class="ac.kr.halford.mapper.LoginJdbcTemplate">
+	<bean id="loginJdbcTemplate" class="ac.kr.halford.dbtemplate.LoginJdbcTemplate">
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
 	
-	<bean id="PostJdbcTemplate" class="ac.kr.halford.mapper.PostJdbcTemplate">
+	<bean id="PostJdbcTemplate" class="ac.kr.halford.dbtemplate.PostJdbcTemplate">
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
 	

@@ -57,14 +57,14 @@ public class SqlInjectionFilter {
 		
 		//	check true -> abnormal sql
 		//	check false -> normal sql
-		//	return false -> abnormal sql
-		//	return true -> normal sql
+		//	return true -> abnormal sql
+		//	return false -> normal sql
 		if (check) {
 			logger.info("abnormal sql");
-			return false;
+			return true;
 		}
 		logger.info("normal sql");
-		return true;
+		return false;
 	}
 	
 	public static String getBoundSql (String sql, Object[] params) {

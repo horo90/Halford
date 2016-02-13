@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import ac.kr.halford.mapper.PostJdbcTemplate;
+import ac.kr.halford.dbtemplate.PostJdbcTemplate;
 import ac.kr.halford.model.PostModel;
 import ac.kr.halford.util.Pager;
 
@@ -68,27 +68,27 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public void addPost(PostModel post) {
+	public int addPost(PostModel post) {
 		logger.info("PostService-addPost");
 		
 //		postMapper.addPost(post);
-		postJdbcTemplate.addPost(post);
+		return postJdbcTemplate.addPost(post);
 	}
 
 	@Override
-	public void updatePost(PostModel post) {
+	public int updatePost(PostModel post) {
 		logger.info("PostService-updatePost");
 		
 //		postMapper.updateCertainPost(post);
-		postJdbcTemplate.updateCertainPost(post);
+		return postJdbcTemplate.updateCertainPost(post);
 	}
 
 	@Override
-	public void deletePost(PostModel post) {
+	public int deletePost(PostModel post) {
 		logger.info("PostService-deletePost");
 		
 //		postMapper.deleteCertainPost(post);
-		postJdbcTemplate.deleteCertainPost(post);
+		return postJdbcTemplate.deleteCertainPost(post);
 		
 	}
 

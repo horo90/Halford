@@ -1,4 +1,4 @@
-package ac.kr.halford.mapper;
+package ac.kr.halford.constants;
 
 public class LoginSql {
 

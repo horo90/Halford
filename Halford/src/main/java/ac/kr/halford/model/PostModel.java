@@ -35,6 +35,8 @@ public class PostModel extends SuperModel {
 	@Override
 	public String toString() {
 		return "PostModel [postId=" + postId + ", parentPostId=" + parentPostId + ", memberId=" + memberId + ", title="
-				+ title + ", contents=" + contents + ", date=" + date + "]";
+				+ title + ", contents=" + contents + ", date=" + date + ", isEmpty=" + isEmpty + "]";
 	}
+
+	
 }

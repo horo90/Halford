@@ -18,6 +18,8 @@ public class MemberModel extends SuperModel {
 
 	@Override
 	public String toString() {
-		return "MemberModel [id=" + id + ", password=" + password + "]";
+		return "MemberModel [id=" + id + ", password=" + password + ", isEmpty=" + isEmpty + "]";
 	}
+
+	
 }

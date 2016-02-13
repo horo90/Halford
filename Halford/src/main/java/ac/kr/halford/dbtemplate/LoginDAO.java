@@ -1,8 +1,8 @@
-package ac.kr.halford.mapper;
+package ac.kr.halford.dbtemplate;
 
 import ac.kr.halford.model.MemberModel;
 
 public interface LoginDAO {
-	public void addMember(MemberModel member);
+	public int addMember(MemberModel member);
 	public MemberModel findMember(MemberModel member);
 }

@@ -64,10 +64,15 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
-	public String join (@ModelAttribute MemberModel member, HttpServletRequest request, Model model) {
+	public String join (@ModelAttribute MemberModel member, HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 		logger.info("join process");
 		
-		loginService.join(member);
+		if (loginService.join(member) != 0) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("isSqli", true);
+			map.put("message", "SQL injection 공격이 감지되었습니다.");
+			redirectAttributes.addFlashAttribute("map", map);
+		}
 		
 		return "redirect:/";
 	}
@@ -136,7 +141,7 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/postPage.do", method={RequestMethod.GET, RequestMethod.POST})
-	public String postPage (HttpServletRequest request, Model model) {
+	public String postPage (HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 		logger.info("postPage-work={}", request.getParameter("work"));
 		//********************************
 		//	work == 1 : write a new post
@@ -144,57 +149,57 @@ public class HomeController {
 		//	work == 3 : modify the post
 		//********************************
 		int work= 0;
-		
-		if (request.getParameter("work") != null) {
+		int postId = -1;
+		try {
 			work = Integer.parseInt(request.getParameter("work"));
-			request.setAttribute("work", work);
+		} catch (NumberFormatException e1) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("isSqli", false);
+			map.put("message", "비정상적인 접근입니다.");
+			redirectAttributes.addFlashAttribute("map", map);
+			return "redirect:/boardPage.do";
+		}
+		
+		request.setAttribute("work", work);
+		
+		PostModel post = new PostModel();
+		
+		if (work == 1) {
+			postService.setPostModel(post);
+			model.addAttribute("post", post);
+		} else {
+			try {
+				postId = Integer.parseInt(request.getParameter("id"));
+			} catch (NumberFormatException e1) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("isSqli", false);
+				map.put("message", "비정상적인 접근입니다.");
+				redirectAttributes.addFlashAttribute("map", map);
+				return "redirect:/boardPage.do";
+			}
 			
-			PostModel post = new PostModel();
-			
-			if (work == 1 || work == 3) {														//	new post & modify the post
+			if (work == 3) {														//	new post & modify the post
+				post.setPostId(postId);
+				post = postService.findCertainPost(post);
 				
-				if (work == 1) {
-					postService.setPostModel(post);
-					
-				} else {
-					if (request.getParameter("id") != null) {
-						int postId = Integer.parseInt(request.getParameter("id"));
-						post.setPostId(postId);
-						post = postService.findCertainPost(post);
-						// sqli가 감지된 경우, null 넘어올 가능성 있음. 아직 처리 안됨.
-						// 임의로 이상한 값을 넣었을 때, 빈 객체가 넘어올 수 있음. 아직 처리 안됨.
-						if (post.isEmpty()) {
-							logger.info("empty");
-						}
-						
-//						if (post == null) {
-//							Map<String, Object> map = new HashMap<String, Object>();
-//							map.put("isSqli", true);
-//							map.put("message", "SQL injection 공격이 감지되었습니다.");
-//							post = new PostModel();
-//						} else if (post.isEmpty()) {
-//							logger.info("해당 게시물 x");
-//							post.setContents("해당하는 게시물이 없습니다.");
-//						}
-						logger.info(post.toString());
-					} else {
-						//	abnormal access
-					}
+				if (post.isEmpty()) {								// postId가 숫자 이지만, db 안에 존재하지 않는 것을 사용할 경우.
+					post.setContents("해당하는 게시물이 없습니다.");
 				}
 				
 				model.addAttribute("post", post);
 			} else if (work  == 2) {												// show the post
-				if (request.getParameter("id") != null) {
-					int postId = Integer.parseInt(request.getParameter("id"));
+					postId = Integer.parseInt(request.getParameter("id"));
+					
 					post.setPostId(postId);
 					
 					post = postService.findCertainPost(post);
-					logger.info(post.toString());
-					//null chceck
+					
+					if (post.isEmpty()) {								// postId가 숫자 이지만, db 안에 존재하지 않는 것을 사용할 경우.
+						logger.info("해당 게시물 x");
+						post.setContents("해당하는 게시물이 없습니다.");
+					}
 					request.setAttribute("post", post);
-				} else {
-					//	abnormal access
-				}
+				
 			} else {
 				// abnormal access
 			}
@@ -204,32 +209,62 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/post.do", method={RequestMethod.POST, RequestMethod.GET})
-	public String post (@ModelAttribute PostModel post, HttpServletRequest request) {
+	public String post (@ModelAttribute PostModel post, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 		logger.info("post");
 		logger.info(post.toString());
 		
-		if (request.getParameter("work") != null) {
-			int work = Integer.parseInt(request.getParameter("work"));
-			logger.info("work : {}", work);
-			if (work == 1) {				//	new post
-				postService.setPostModel(post);
-				postService.addPost(post);
-			} else if (work == 3) {			//	modify post
-				postService.updatePost(post);
-			} else if (work == 4) {			// delete post
-				if (request.getParameter("id") != null) {
-					int postId = Integer.parseInt(request.getParameter("id"));
+		int work = 0;
+		try {
+			work = Integer.parseInt(request.getParameter("work"));
+		} catch (NumberFormatException e) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("isSqli", false);
+			map.put("message", "비정상적인 접근입니다.");
+			redirectAttributes.addFlashAttribute("map", map);
+			return "redirect:/boardPage.do";
+		}
+		
+		logger.info("work : {}", work);
+		if (work == 1) {				//	new post
+			postService.setPostModel(post);
+			if (postService.addPost(post) != 0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("isSqli", true);
+				map.put("message", "SQL injection 공격이 감지되었습니다.");
+				redirectAttributes.addFlashAttribute("map", map);
+			}
+		} else if (work == 3) {			//	modify post
+			if (postService.updatePost(post) != 0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("isSqli", true);
+				map.put("message", "SQL injection 공격이 감지되었습니다.");
+				redirectAttributes.addFlashAttribute("map", map);
+			}
+		} else if (work == 4) {			// delete post
+			if (request.getParameter("id") != null) {
+				int postId;
+				try {
+					postId = Integer.parseInt(request.getParameter("id"));
 					post = new PostModel();
 					post.setPostId(postId);
-					postService.deletePost(post);
-				} else {
-					//	abnormal access
+					if (postService.deletePost(post) != 0) {
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("isSqli", true);
+						map.put("message", "SQL injection 공격이 감지되었습니다.");
+						redirectAttributes.addFlashAttribute("map", map);
+					}
+				} catch (NumberFormatException e) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put("isSqli", false);
+					map.put("message", "비정상적인 접근입니다.");
+					redirectAttributes.addFlashAttribute("map", map);
 				}
+				
 			} else {
 				//	abnormal access
 			}
 		} else {
-			//abnormal access
+			//	abnormal access
 		}
 		
 		return "redirect:/boardPage.do";
