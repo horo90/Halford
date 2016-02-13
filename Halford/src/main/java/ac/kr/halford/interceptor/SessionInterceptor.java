@@ -18,6 +18,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 		logger.info("session interceptor");
 		
 		HttpSession session = request.getSession();
+		
 		if (session == null || session.getAttribute("id") == null) {
 			logger.info("no session");
 			response.sendRedirect(request.getContextPath() + "/");
@@ -25,6 +26,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 		} else {
 			logger.info(session.getAttribute("id").toString());
 		}
+		
 		
 		return super.preHandle(request, response, handler);
 	}

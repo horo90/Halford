@@ -16,6 +16,12 @@
 	$(document).ready(function () {
 		$("#message-box").css("display", "none");
 		$("#message-box").slideDown();
+		
+		/*
+		$("#filter-toggle-button").click(function () {
+			
+		});
+		*/
 	});
 </script>
 </head>
@@ -63,7 +69,21 @@
 						<a href="./joinPage.do" role="button" class="btn btn-default btn-block">회원가입</a>
 					</div>
 				</div>
+				
 			</form:form>
+			<div class="form-group">
+				<span class="col-sm-4"></span>
+				<div class="col-sm-4">
+					<c:choose>
+						<c:when test="${sessionScope.filter == null || sessionScope.filter == false }">
+							<a href="./filterToggle.do" class="btn btn-success btn-block" role="button">필터 적용</a>
+						</c:when>
+						<c:when test="${sessionScope.filter == true }">
+							<a href="./filterToggle.do" class="btn btn-danger btn-block" role="button">필터 해제</a>
+						</c:when>
+					</c:choose>
+				</div>
+			</div>
 		</fieldset>
 	</div>
 </body>

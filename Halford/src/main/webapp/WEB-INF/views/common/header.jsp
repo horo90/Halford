@@ -12,5 +12,6 @@
 		<li class="${param.page == 'boardPage' ? 'active' : '' }"><a href="./boardPage.do">Home</a></li>
 		<li><a><span class="glyphicon glyphicon-user">${sessionScope.id }</span></a></li>
 		<li><a href="./logout.do">Logout</a></li>
+		<li><a><span class="glyphicon glyphicon-ok-circle"></span></a></li>
 	</ul>
 </nav>

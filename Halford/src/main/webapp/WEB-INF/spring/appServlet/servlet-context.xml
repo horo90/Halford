@@ -30,6 +30,7 @@
 			<exclude-mapping path="/join*"/>
 			<exclude-mapping path="/login*"/>
 			<exclude-mapping path="/"/>
+			<exclude-mapping path="/filterToggle.do"/>
 			<beans:bean class="ac.kr.halford.interceptor.SessionInterceptor"></beans:bean>
 		</interceptor>
 	</interceptors>

@@ -1,11 +1,11 @@
 package ac.kr.halford;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ac.kr.halford.model.MemberModel;
@@ -268,5 +269,21 @@ public class HomeController {
 		}
 		
 		return "redirect:/boardPage.do";
+	}
+	
+	@RequestMapping(value = "/filterToggle.do", method = RequestMethod.GET)
+	public String toggleFilter (HttpServletRequest request) {
+		logger.info("toggle");
+		
+		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("filter") == null) session.setAttribute("filter", false);
+		
+		boolean filter = (Boolean) session.getAttribute("filter");
+		
+		if (filter) session.setAttribute("filter", false);
+		else session.setAttribute("filter", true);
+		
+		return "redirect:/";
 	}
 }
