@@ -71,14 +71,14 @@ public class HomeController {
 		if (loginService.join(member) != 0) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("isSqli", true);
-			map.put("message", "SQL injection °ø°ÝÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.");
+			map.put("message", "SQL injection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 			redirectAttributes.addFlashAttribute("map", map);
 		}
 		
 		return "redirect:/";
 	}
 	
-	// ³ªÁß¿¡ ¹®ÀÚ¿­ ¸ðµÎ »ó¼öÈ­ ½ÃÄÑ¾ßÇÔ.
+	// ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½È­ ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½.
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
 	public String login (@ModelAttribute MemberModel member, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
 		logger.info("login process");
@@ -89,20 +89,20 @@ public class HomeController {
 		if (member != null) {
 			if (!member.isEmpty()) {
 				logger.info("loing success");
-				map.put("isSqli", false);
-				redirectAttributes.addFlashAttribute("map", map);
+//				map.put("isSqli", false);
+//				redirectAttributes.addFlashAttribute("map", map);
 				return "redirect:/boardPage.do";
 			} else {
 				logger.info("login failed");
 				map.put("isSqli", false);
-				map.put("message", "ÇØ´ç id¿Í password¿¡ ÀÏÄ¡ÇÏ´Â Á¤º¸°¡ ¾ø½À´Ï´Ù.");
+				map.put("message", "ï¿½Ø´ï¿½ idï¿½ï¿½ passwordï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 				redirectAttributes.addFlashAttribute("map", map);
 				return "redirect:/";
 			}
 		} else {
 			logger.info("detecting sqli");
 			map.put("isSqli", true);
-			map.put("message", "SQL injection °ø°ÝÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.");
+			map.put("message", "SQL injection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 			redirectAttributes.addFlashAttribute("map", map);
 			return "redirect:/";
 		}
@@ -156,7 +156,7 @@ public class HomeController {
 		} catch (NumberFormatException e1) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("isSqli", false);
-			map.put("message", "ºñÁ¤»óÀûÀÎ Á¢±ÙÀÔ´Ï´Ù.");
+			map.put("message", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 			redirectAttributes.addFlashAttribute("map", map);
 			return "redirect:/boardPage.do";
 		}
@@ -174,7 +174,7 @@ public class HomeController {
 			} catch (NumberFormatException e1) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("isSqli", false);
-				map.put("message", "ºñÁ¤»óÀûÀÎ Á¢±ÙÀÔ´Ï´Ù.");
+				map.put("message", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 				redirectAttributes.addFlashAttribute("map", map);
 				return "redirect:/boardPage.do";
 			}
@@ -183,8 +183,8 @@ public class HomeController {
 				post.setPostId(postId);
 				post = postService.findCertainPost(post);
 				
-				if (post.isEmpty()) {								// postId°¡ ¼ýÀÚ ÀÌÁö¸¸, db ¾È¿¡ Á¸ÀçÇÏÁö ¾Ê´Â °ÍÀ» »ç¿ëÇÒ °æ¿ì.
-					post.setContents("ÇØ´çÇÏ´Â °Ô½Ã¹°ÀÌ ¾ø½À´Ï´Ù.");
+				if (post.isEmpty()) {								// postIdï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, db ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.
+					post.setContents("ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½Ô½Ã¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 				}
 				
 				model.addAttribute("post", post);
@@ -195,9 +195,9 @@ public class HomeController {
 					
 					post = postService.findCertainPost(post);
 					
-					if (post.isEmpty()) {								// postId°¡ ¼ýÀÚ ÀÌÁö¸¸, db ¾È¿¡ Á¸ÀçÇÏÁö ¾Ê´Â °ÍÀ» »ç¿ëÇÒ °æ¿ì.
-						logger.info("ÇØ´ç °Ô½Ã¹° x");
-						post.setContents("ÇØ´çÇÏ´Â °Ô½Ã¹°ÀÌ ¾ø½À´Ï´Ù.");
+					if (post.isEmpty()) {								// postIdï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, db ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.
+						logger.info("ï¿½Ø´ï¿½ ï¿½Ô½Ã¹ï¿½ x");
+						post.setContents("ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½Ô½Ã¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					}
 					request.setAttribute("post", post);
 				
@@ -220,7 +220,7 @@ public class HomeController {
 		} catch (NumberFormatException e) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("isSqli", false);
-			map.put("message", "ºñÁ¤»óÀûÀÎ Á¢±ÙÀÔ´Ï´Ù.");
+			map.put("message", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 			redirectAttributes.addFlashAttribute("map", map);
 			return "redirect:/boardPage.do";
 		}
@@ -231,14 +231,14 @@ public class HomeController {
 			if (postService.addPost(post) != 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("isSqli", true);
-				map.put("message", "SQL injection °ø°ÝÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.");
+				map.put("message", "SQL injection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 				redirectAttributes.addFlashAttribute("map", map);
 			}
 		} else if (work == 3) {			//	modify post
 			if (postService.updatePost(post) != 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("isSqli", true);
-				map.put("message", "SQL injection °ø°ÝÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.");
+				map.put("message", "SQL injection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 				redirectAttributes.addFlashAttribute("map", map);
 			}
 		} else if (work == 4) {			// delete post
@@ -251,13 +251,13 @@ public class HomeController {
 					if (postService.deletePost(post) != 0) {
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put("isSqli", true);
-						map.put("message", "SQL injection °ø°ÝÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.");
+						map.put("message", "SQL injection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 						redirectAttributes.addFlashAttribute("map", map);
 					}
 				} catch (NumberFormatException e) {
 					Map<String, Object> map = new HashMap<String, Object>();
 					map.put("isSqli", false);
-					map.put("message", "ºñÁ¤»óÀûÀÎ Á¢±ÙÀÔ´Ï´Ù.");
+					map.put("message", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 					redirectAttributes.addFlashAttribute("map", map);
 				}
 				

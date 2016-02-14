@@ -8,12 +8,13 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import ac.kr.halford.constants.PostSql;
-import ac.kr.halford.mapper.SqlInjectionFilter;
 import ac.kr.halford.model.PostModel;
 
 public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
@@ -29,7 +30,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -43,7 +46,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -57,7 +62,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -71,29 +78,33 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
-			try {
-				return this.getJdbcTemplate().queryForObject(dq,
-						new RowMapper<PostModel> () {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+			//if want to get single row, It's correct using queryForObject() method -> only return single row.
+			// but in this case, for developing vulnerable web application, use query() method-> allow return multi rows. 
+			List<PostModel> list = this.getJdbcTemplate().query(dq, new RowMapper<PostModel> () {
+				@Override
+				public PostModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+					PostModel post = new PostModel();
+					post.setPostId(rs.getInt("post_id"));
+					post.setMemberId(rs.getString("member_id"));
+					post.setTitle(rs.getString("title"));
+					post.setContents(rs.getString("contents"));
+					post.setDate(rs.getString("post_date"));
+					post.setEmpty(false);
+					return post;
+				}
 
-							@Override
-							public PostModel mapRow(ResultSet rs, int rowNum) throws SQLException {
-								PostModel post = new PostModel();
-								post.setPostId(rs.getInt("post_id"));
-								post.setMemberId(rs.getString("member_id"));
-								post.setTitle(rs.getString("title"));
-								post.setContents(rs.getString("contents"));
-								post.setDate(rs.getString("post_date"));
-								post.setEmpty(false);
-								return post;
-							}
-
-				});
-			} catch (EmptyResultDataAccessException e) {
+			});
+			if (list.size() == 0) {
 				post = new PostModel();
 				post.setEmpty(true);
 				return post;
+			} else {
+				return list.get(0);
 			}
+			
 		} else return null;
 	}
 
@@ -106,8 +117,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
-			try {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {			try {
 				return this.getJdbcTemplate().query(dq, 
 						new RowMapper<PostModel> () {
 

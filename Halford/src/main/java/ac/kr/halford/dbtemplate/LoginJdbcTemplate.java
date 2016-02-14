@@ -2,26 +2,30 @@ package ac.kr.halford.dbtemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import ac.kr.halford.constants.LoginSql;
-import ac.kr.halford.mapper.SqlInjectionFilter;
 import ac.kr.halford.model.MemberModel;
 
 public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 	
 	
 	private static Logger logger = LoggerFactory.getLogger(LoginJdbcTemplate.class);
+	
+	
 
 	@Override
 	public int addMember(MemberModel member) {
-		// ¿©±â ? ¾ÈÇÏ°í, Á÷Á¢ ¶§·Á³ÖÀ¸¸é  new Object ¾ÈÇØµµ µÇ°í, ÀÌ °æ¿ì°¡ ¸Å¿ì Ãë¾àÇÑ °æ¿ì ÀÏµí.
+		// ï¿½ï¿½ï¿½ï¿½ ? ï¿½ï¿½ï¿½Ï°ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  new Object ï¿½ï¿½ï¿½Øµï¿½ ï¿½Ç°ï¿½, ï¿½ï¿½ ï¿½ï¿½ì°¡ ï¿½Å¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ïµï¿½.
 		
 		Object[] params = new Object[]{member.getId(), member.getPassword()};
 		String fq = LoginSql.addMember;
@@ -29,12 +33,14 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		
 		logger.info(dq);
 		
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
+		boolean filter = SqlInjectionFilter.isFiltered();
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
 		
-		//³ªÁß¿¡´Â return value¸¦ Áà¾ßÇÒµí
+		//ï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½ return valueï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Òµï¿½
 	}
 
 	@Override
@@ -47,17 +53,21 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		logger.info(dq);
 		
 		//****************************************
-		//	Á¤»ó Äõ¸®¿¡ ´ëÇØ
-		//	resultsetÀÌ ÀÖ´Â °æ¿ì, ÇØ´çÇÏ´Â model ¸®ÅÏ.
-		//	resultsetÀÌ ¾øÀ¸¸é, empty model ¸®ÅÏ.
+		//	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		//	resultsetï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½, ï¿½Ø´ï¿½ï¿½Ï´ï¿½ model ï¿½ï¿½ï¿½ï¿½.
+		//	resultsetï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, empty model ï¿½ï¿½ï¿½ï¿½.
 		//	
-		//	sqli°¡ °¨ÁöµÈ °æ¿ì, null ¸®ÅÏ.
-		//	º» ¾ÖÇÃ¸®ÄÉ´Ï¼Ç¿¡¼­ °øÅæÀ¸·Î Àû¿ë
+		//	sqliï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½, null ï¿½ï¿½ï¿½ï¿½.
+		//	ï¿½ï¿½ ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½É´Ï¼Ç¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		//****************************************
-		if (!SqlInjectionFilter.isSQLi(fq, dq)) {
+		
+		boolean filter = SqlInjectionFilter.isFiltered();
+		logger.info("filter : {}", filter);
+		
+		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			
-			try {
-				return this.getJdbcTemplate().queryForObject(dq, new RowMapper<MemberModel> () {
+			
+			List<MemberModel> list = this.getJdbcTemplate().query(dq, new RowMapper<MemberModel> () {
 					
 					@Override
 					public MemberModel mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -66,12 +76,16 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 						return member;
 					}
 
-				});
-			} catch (EmptyResultDataAccessException e) {
+			});
+			
+			if (list.size() == 0) {
 				member = new MemberModel();
 				member.setEmpty(true);
 				return member;
+			} else {
+				return list.get(0);
 			}
+			
 		} else return null;
 		
 		

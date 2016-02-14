@@ -1,7 +1,11 @@
-package ac.kr.halford.mapper;
+package ac.kr.halford.dbtemplate;
+
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class SqlInjectionFilter {
 	
@@ -14,7 +18,19 @@ public class SqlInjectionFilter {
 	private static final String quotesFilter = "'([^']*)'";
 	private static final String NumEqNumFilter = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
 	
-	// dq->ddq limit filter ¿À·ù
+	public static boolean isFiltered () {
+		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		
+		HttpSession session = attr.getRequest().getSession();
+		if (session.getAttribute("filter") == null) {
+			session.setAttribute("filter", false);
+		}
+		
+		return (Boolean) session.getAttribute("filter");
+	}
+	
+	
+	// dq->ddq limit filter ï¿½ï¿½ï¿½ï¿½
 	
 	public static boolean isSQLi (String FQ, String DQ) {
 		
@@ -26,7 +42,7 @@ public class SqlInjectionFilter {
 		
 		String Ddq = DQ.replaceAll(stringFilter + "|" + numberFilter, "=");
 		Ddq = Ddq.replaceAll(likeFilter, "LIKE ");
-		Ddq = Ddq.replaceAll(quotesFilter, "");									// ÀÌ°Å ¶§¹®¿¡ Á¶±Ý °É¸².
+		Ddq = Ddq.replaceAll(quotesFilter, "");									// ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½É¸ï¿½.
 		Ddq = Ddq.replaceAll(NumEqNumFilter, "=");
 		Ddq = Ddq.replaceAll(limitFilter, "LIMIT , ");
 		
@@ -38,9 +54,9 @@ public class SqlInjectionFilter {
 		byte[] result = new byte[FdqBytes.length]; 
 		boolean check = false;
 		
-		// ÀÌ·¸°Ô ÇÏ´Â°Ô ºü¸¥Áö, ±×³É string compareÇÏ´Â°Ô ºü¸¥Áö Àß ¸ð¸£°Ú´Ù.
-		// °£´ÜÇÏ±â·Î´Â string compare°¡ °£´ÜÇÔ.
-		// byte ¹è¿­ÀÇ ±æÀÌ¸¦ ÀÌ¿ëÇØµµ °¡´É.
+		// ï¿½Ì·ï¿½ï¿½ï¿½ ï¿½Ï´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½×³ï¿½ string compareï¿½Ï´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ð¸£°Ú´ï¿½.
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½Î´ï¿½ string compareï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+		// byte ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½Ì¿ï¿½ï¿½Øµï¿½ ï¿½ï¿½ï¿½ï¿½.
 		for (int i = 0;;++i) {
 			if (i < FdqBytes.length && i < DdqBytes.length) {
 				result[i] = (byte)(FdqBytes[i] ^ DdqBytes[i]);
@@ -69,8 +85,8 @@ public class SqlInjectionFilter {
 	
 	public static String getBoundSql (String sql, Object[] params) {
 		
-		// params´Â model class³ª Map class¿¡ ÀÖ´Â ¼Ó¼ºÀ» object ¹è¿­·Î ¹Ù²Ù±â ¶§¹®¿¡ String or ¼÷ÀÚ °è¿­ »ÓÀÌ´Ù.
-		// ÀÌ·±½ÄÀ¸·Î ÇÏ·Á¸é ±»ÀÌ MapÀÌ³ª Model class¸¦ »ç¿ëÇÒ ÇÊ¿ä´Â ¾øÁö¸¸, mybatis ±â¹Ý¿¡¼­ ¹Ù²Ù´Ù º¸´Ï ÀÌ·± ÇüÅÂ°¡ µÆ´Ù.
+		// paramsï¿½ï¿½ model classï¿½ï¿½ Map classï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ó¼ï¿½ï¿½ï¿½ object ï¿½è¿­ï¿½ï¿½ ï¿½Ù²Ù±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ String or ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ ï¿½ï¿½ï¿½Ì´ï¿½.
+		// ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Mapï¿½Ì³ï¿½ Model classï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, mybatis ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ ï¿½Ù²Ù´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½Â°ï¿½ ï¿½Æ´ï¿½.
 		if (params.length > 0) {
 			for (Object value : params) {
 				if (value.getClass() == String.class) {
