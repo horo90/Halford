@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import ac.kr.halford.constants.Messages;
+
 public class SessionInterceptor extends HandlerInterceptorAdapter {
 	
 	private Logger logger = LoggerFactory.getLogger(SessionInterceptor.class);
@@ -19,12 +21,12 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 		
 		HttpSession session = request.getSession();
 		
-		if (session == null || session.getAttribute("id") == null) {
+		if (session == null || session.getAttribute(Messages.idKey) == null) {
 			logger.info("no session");
 			response.sendRedirect(request.getContextPath() + "/");
 			return false;
 		} else {
-			logger.info(session.getAttribute("id").toString());
+			logger.info(session.getAttribute(Messages.idKey).toString());
 		}
 		
 		

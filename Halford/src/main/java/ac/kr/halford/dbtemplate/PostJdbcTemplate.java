@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
+import ac.kr.halford.constants.Messages;
 import ac.kr.halford.constants.PostSql;
 import ac.kr.halford.model.PostModel;
 
@@ -111,7 +112,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 	@Override
 	public List<PostModel> findPosts(Map<String, Object> map) {
 		
-		Object[] params = new Object[] {map.get("current")};
+		Object[] params = new Object[] {map.get(Messages.currentkey)};
 		String fq = PostSql.findPosts;
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
 		

@@ -25,8 +25,6 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 
 	@Override
 	public int addMember(MemberModel member) {
-		// ���� ? ���ϰ�, ���� ����������  new Object ���ص� �ǰ�, �� ��찡 �ſ� ����� ��� �ϵ�.
-		
 		Object[] params = new Object[]{member.getId(), member.getPassword()};
 		String fq = LoginSql.addMember;
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
@@ -39,8 +37,6 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
-		
-		//���߿��� return value�� ����ҵ�
 	}
 
 	@Override
@@ -51,15 +47,6 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		String dq = SqlInjectionFilter.getBoundSql(fq, params);
 		
 		logger.info(dq);
-		
-		//****************************************
-		//	���� ������ ����
-		//	resultset�� �ִ� ���, �ش��ϴ� model ����.
-		//	resultset�� ������, empty model ����.
-		//	
-		//	sqli�� ������ ���, null ����.
-		//	�� ���ø��ɴϼǿ��� �������� ����
-		//****************************************
 		
 		boolean filter = SqlInjectionFilter.isFiltered();
 		logger.info("filter : {}", filter);

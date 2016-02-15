@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import ac.kr.halford.constants.Messages;
 import ac.kr.halford.dbtemplate.PostJdbcTemplate;
 import ac.kr.halford.model.PostModel;
 import ac.kr.halford.util.Pager;
@@ -28,16 +29,12 @@ public class PostServiceImpl implements PostService {
 	
 	@Autowired
 	private PostJdbcTemplate postJdbcTemplate;
-//	private PostMapper postMapper;
 
 	@Override
 	public PostModel findCertainPost(PostModel post) {
 		logger.info("PostService-findCertainPost");
 		
-//		post = postMapper.findCertainPost(post);
 		return postJdbcTemplate.findCertainPost(post);
-		
-//		return post;
 	}
 
 	@Override
@@ -45,9 +42,8 @@ public class PostServiceImpl implements PostService {
 		logger.info("PostService-findPosts");
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("current", (current-1) * 10);
+		map.put(Messages.currentkey, (current-1) * 10);
 		
-//		return postMapper.findPosts(map);
 		return postJdbcTemplate.findPosts(map);
 	}
 
@@ -62,7 +58,7 @@ public class PostServiceImpl implements PostService {
 		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpSession session = attr.getRequest().getSession();
 		
-		post.setMemberId(session.getAttribute("id").toString());
+		post.setMemberId(session.getAttribute(Messages.idKey).toString());
 		post.setDate(currentTime);
 		
 	}
@@ -71,7 +67,6 @@ public class PostServiceImpl implements PostService {
 	public int addPost(PostModel post) {
 		logger.info("PostService-addPost");
 		
-//		postMapper.addPost(post);
 		return postJdbcTemplate.addPost(post);
 	}
 
@@ -79,7 +74,6 @@ public class PostServiceImpl implements PostService {
 	public int updatePost(PostModel post) {
 		logger.info("PostService-updatePost");
 		
-//		postMapper.updateCertainPost(post);
 		return postJdbcTemplate.updateCertainPost(post);
 	}
 
@@ -87,14 +81,12 @@ public class PostServiceImpl implements PostService {
 	public int deletePost(PostModel post) {
 		logger.info("PostService-deletePost");
 		
-//		postMapper.deleteCertainPost(post);
 		return postJdbcTemplate.deleteCertainPost(post);
 		
 	}
 
 	@Override
 	public void setPager(Pager pager) {
-//		int totalPostCount = postMapper.getPostCount();
 		int totalPostCount = postJdbcTemplate.getPostCount();
 		
 		pager.setPager(totalPostCount);

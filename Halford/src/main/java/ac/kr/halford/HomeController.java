@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import ac.kr.halford.constants.Messages;
 import ac.kr.halford.model.MemberModel;
 import ac.kr.halford.model.PostModel;
 import ac.kr.halford.service.LoginService;
@@ -43,7 +44,7 @@ public class HomeController {
 		logger.info("main page");
 		
 		MemberModel member = new MemberModel();
-		model.addAttribute("member", member);
+		model.addAttribute(Messages.memberKey, member);
 		
 		
 		if (request.getRequestURI().equals(request.getContextPath()+"/") && request.getSession().getAttribute("id") != null) {
@@ -59,7 +60,7 @@ public class HomeController {
 		
 		MemberModel member = new MemberModel();
 		
-		model.addAttribute("member", member);
+		model.addAttribute(Messages.memberKey, member);
 		
 		return "join/join";
 	}
@@ -70,9 +71,9 @@ public class HomeController {
 		
 		if (loginService.join(member) != 0) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("isSqli", true);
-			map.put("message", "SQL injection ������ �����Ǿ����ϴ�.");
-			redirectAttributes.addFlashAttribute("map", map);
+			map.put(Messages.isSqliKey, true);
+			map.put(Messages.messageKey, Messages.detectSqli);
+			redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 		}
 		
 		return "redirect:/";
@@ -94,16 +95,16 @@ public class HomeController {
 				return "redirect:/boardPage.do";
 			} else {
 				logger.info("login failed");
-				map.put("isSqli", false);
-				map.put("message", "�ش� id�� password�� ��ġ�ϴ� ������ �����ϴ�.");
-				redirectAttributes.addFlashAttribute("map", map);
+				map.put(Messages.isSqliKey, false);
+				map.put(Messages.messageKey, Messages.noMember);
+				redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 				return "redirect:/";
 			}
 		} else {
 			logger.info("detecting sqli");
-			map.put("isSqli", true);
-			map.put("message", "SQL injection ������ �����Ǿ����ϴ�.");
-			redirectAttributes.addFlashAttribute("map", map);
+			map.put(Messages.isSqliKey, true);
+			map.put(Messages.messageKey, Messages.detectSqli);
+			redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 			return "redirect:/";
 		}
 	}
@@ -123,8 +124,8 @@ public class HomeController {
 		int current = 0;
 		Pager pager = new Pager();
 		
-		if (request.getParameter("current") != null) {
-			current = Integer.parseInt(request.getParameter("current"));
+		if (request.getParameter(Messages.currentkey) != null) {
+			current = Integer.parseInt(request.getParameter(Messages.currentkey));
 		} else current = 1;
 		pager.setCurrentPage(current);
 		
@@ -133,17 +134,15 @@ public class HomeController {
 		
 		List<PostModel> postList = postService.findPosts(current);
 		
-		if (postList == null) logger.info("postList is null");
-		else logger.info("postList is not null");
-		request.setAttribute("postList", postList);
-		request.setAttribute("pager", pager);
+		request.setAttribute(Messages.postListKey, postList);
+		request.setAttribute(Messages.pagerKey, pager);
 		
 		return "board/board";
 	}
 	
 	@RequestMapping(value = "/postPage.do", method={RequestMethod.GET, RequestMethod.POST})
 	public String postPage (HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
-		logger.info("postPage-work={}", request.getParameter("work"));
+		logger.info("postPage-work={}", request.getParameter(Messages.workKey));
 		//********************************
 		//	work == 1 : write a new post
 		//	work == 2 : show the post
@@ -152,55 +151,47 @@ public class HomeController {
 		int work= 0;
 		int postId = -1;
 		try {
-			work = Integer.parseInt(request.getParameter("work"));
+			work = Integer.parseInt(request.getParameter(Messages.workKey));
 		} catch (NumberFormatException e1) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("isSqli", false);
-			map.put("message", "���������� �����Դϴ�.");
-			redirectAttributes.addFlashAttribute("map", map);
+			map.put(Messages.isSqliKey, false);
+			map.put(Messages.messageKey, Messages.abnormalAccess);
+			redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 			return "redirect:/boardPage.do";
 		}
 		
-		request.setAttribute("work", work);
+		request.setAttribute(Messages.workKey, work);
 		
 		PostModel post = new PostModel();
 		
 		if (work == 1) {
 			postService.setPostModel(post);
-			model.addAttribute("post", post);
+			model.addAttribute(Messages.postKey, post);
 		} else {
 			try {
-				postId = Integer.parseInt(request.getParameter("id"));
+				postId = Integer.parseInt(request.getParameter(Messages.idKey));
 			} catch (NumberFormatException e1) {
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("isSqli", false);
-				map.put("message", "���������� �����Դϴ�.");
-				redirectAttributes.addFlashAttribute("map", map);
+				map.put(Messages.isSqliKey, false);
+				map.put(Messages.messageKey, Messages.abnormalAccess);
+				redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 				return "redirect:/boardPage.do";
 			}
 			
-			if (work == 3) {														//	new post & modify the post
+			if (work == 3) {
 				post.setPostId(postId);
 				post = postService.findCertainPost(post);
 				
-				if (post.isEmpty()) {								// postId�� ���� ������, db �ȿ� �������� �ʴ� ���� ����� ���.
-					post.setContents("�ش��ϴ� �Խù��� �����ϴ�.");
-				}
+				if (post.isEmpty()) post.setContents(Messages.noPost);
 				
-				model.addAttribute("post", post);
+				model.addAttribute(Messages.postKey, post);
 			} else if (work  == 2) {												// show the post
-					postId = Integer.parseInt(request.getParameter("id"));
-					
 					post.setPostId(postId);
-					
 					post = postService.findCertainPost(post);
 					
-					if (post.isEmpty()) {								// postId�� ���� ������, db �ȿ� �������� �ʴ� ���� ����� ���.
-						logger.info("�ش� �Խù� x");
-						post.setContents("�ش��ϴ� �Խù��� �����ϴ�.");
-					}
-					request.setAttribute("post", post);
-				
+					if (post.isEmpty()) post.setContents(Messages.noPost);
+					
+					request.setAttribute(Messages.postKey, post);
 			} else {
 				// abnormal access
 			}
@@ -216,12 +207,12 @@ public class HomeController {
 		
 		int work = 0;
 		try {
-			work = Integer.parseInt(request.getParameter("work"));
+			work = Integer.parseInt(request.getParameter(Messages.workKey));
 		} catch (NumberFormatException e) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("isSqli", false);
-			map.put("message", "���������� �����Դϴ�.");
-			redirectAttributes.addFlashAttribute("map", map);
+			map.put(Messages.isSqliKey, false);
+			map.put(Messages.messageKey, Messages.abnormalAccess);
+			redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 			return "redirect:/boardPage.do";
 		}
 		
@@ -230,35 +221,35 @@ public class HomeController {
 			postService.setPostModel(post);
 			if (postService.addPost(post) != 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("isSqli", true);
-				map.put("message", "SQL injection ������ �����Ǿ����ϴ�.");
-				redirectAttributes.addFlashAttribute("map", map);
+				map.put(Messages.isSqliKey, true);
+				map.put(Messages.messageKey, Messages.detectSqli);
+				redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 			}
 		} else if (work == 3) {			//	modify post
 			if (postService.updatePost(post) != 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("isSqli", true);
-				map.put("message", "SQL injection ������ �����Ǿ����ϴ�.");
-				redirectAttributes.addFlashAttribute("map", map);
+				map.put(Messages.isSqliKey, true);
+				map.put(Messages.messageKey, Messages.detectSqli);
+				redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 			}
 		} else if (work == 4) {			// delete post
-			if (request.getParameter("id") != null) {
+			if (request.getParameter(Messages.idKey) != null) {
 				int postId;
 				try {
-					postId = Integer.parseInt(request.getParameter("id"));
+					postId = Integer.parseInt(request.getParameter(Messages.idKey));
 					post = new PostModel();
 					post.setPostId(postId);
 					if (postService.deletePost(post) != 0) {
 						Map<String, Object> map = new HashMap<String, Object>();
-						map.put("isSqli", true);
-						map.put("message", "SQL injection ������ �����Ǿ����ϴ�.");
-						redirectAttributes.addFlashAttribute("map", map);
+						map.put(Messages.isSqliKey, true);
+						map.put(Messages.messageKey, Messages.detectSqli);
+						redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 					}
 				} catch (NumberFormatException e) {
 					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("isSqli", false);
-					map.put("message", "���������� �����Դϴ�.");
-					redirectAttributes.addFlashAttribute("map", map);
+					map.put(Messages.isSqliKey, false);
+					map.put(Messages.messageKey, Messages.abnormalAccess);
+					redirectAttributes.addFlashAttribute(Messages.mapKey, map);
 				}
 				
 			} else {
@@ -277,12 +268,12 @@ public class HomeController {
 		
 		HttpSession session = request.getSession();
 		
-		if (session.getAttribute("filter") == null) session.setAttribute("filter", false);
+		if (session.getAttribute(Messages.filterKey) == null) session.setAttribute(Messages.filterKey, false);
 		
-		boolean filter = (Boolean) session.getAttribute("filter");
+		boolean filter = (Boolean) session.getAttribute(Messages.filterKey);
 		
-		if (filter) session.setAttribute("filter", false);
-		else session.setAttribute("filter", true);
+		if (filter) session.setAttribute(Messages.filterKey, false);
+		else session.setAttribute(Messages.filterKey, true);
 		
 		return "redirect:/";
 	}

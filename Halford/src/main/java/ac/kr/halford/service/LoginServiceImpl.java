@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import ac.kr.halford.constants.Messages;
 import ac.kr.halford.dbtemplate.LoginJdbcTemplate;
 import ac.kr.halford.model.MemberModel;
 
@@ -21,14 +22,12 @@ public class LoginServiceImpl implements LoginService {
 	
 	@Autowired
 	private LoginJdbcTemplate loginJdbcTemplate;
-//	private LoginMapper loginMapper;
 
 	@Override
 	public int join(MemberModel member) {
 		logger.info("LoginService-join");
 		
 		return loginJdbcTemplate.addMember(member);
-//		loginMapper.addMember(member);
 	}
 
 	@Override
@@ -36,15 +35,14 @@ public class LoginServiceImpl implements LoginService {
 		logger.info("LoginService-login");
 		logger.info(member.toString());
 		
-//		member = loginMapper.findMember(member);
 		member = loginJdbcTemplate.findMember(member);
 		
-		if (member != null) {	// Á¤»ó Äõ¸®
+		if (member != null) {	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (!member.isEmpty()) {
 				ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 				HttpSession session = attr.getRequest().getSession();
 				session.setAttribute("id", member.getId());
-			} else ;	// Á¤»óÀûÀÎ login ½ÇÆÐ
+			} else ;	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ login ï¿½ï¿½ï¿½ï¿½
 			
 		} else ;	//sqli
 		
@@ -55,7 +53,7 @@ public class LoginServiceImpl implements LoginService {
 	public void logout() {
 		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpSession session = attr.getRequest().getSession();
-		session.setAttribute("id", null);
+		session.setAttribute(Messages.idKey, null);
 	}
 
 }

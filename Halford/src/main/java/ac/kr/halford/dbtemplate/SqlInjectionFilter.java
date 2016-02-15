@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import ac.kr.halford.constants.Messages;
+
 public class SqlInjectionFilter {
 	
 	private static Logger logger = LoggerFactory.getLogger(SqlInjectionFilter.class);
@@ -22,11 +24,11 @@ public class SqlInjectionFilter {
 		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		
 		HttpSession session = attr.getRequest().getSession();
-		if (session.getAttribute("filter") == null) {
-			session.setAttribute("filter", false);
+		if (session.getAttribute(Messages.filterKey) == null) {
+			session.setAttribute(Messages.filterKey, false);
 		}
 		
-		return (Boolean) session.getAttribute("filter");
+		return (Boolean) session.getAttribute(Messages.filterKey);
 	}
 	
 	
