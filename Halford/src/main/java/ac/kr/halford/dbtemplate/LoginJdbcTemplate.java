@@ -26,9 +26,9 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -43,10 +43,11 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+//		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		logger.info("filter : {}", filter);
 		
-		if (dq != null && (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq)))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			
 //			try {
 				List<MemberModel> list = this.getJdbcTemplate().query(dq, new RowMapper<MemberModel> () {
@@ -74,17 +75,19 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 	}
 
 	@Override
-	public boolean findFilter() {
+	public int findFilter() {
 		
-		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
-		else return true;
+//		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
+//		else return true;
+		return this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class);
 	}
 
 	@Override
-	public void updateFilter() {
-		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) {
-			this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {1});
-		} else this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {0});
+	public void updateFilter(int filter) {
+		this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {filter});
+//		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) {
+//			this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {1});
+//		} else this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {0});
 		
 	}
 

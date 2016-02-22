@@ -17,16 +17,20 @@ public class SqlInjectionFilter {
 	private static final String quotesFilter = "'([^']*)'";
 	private static final String NumEqNumFilter = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
 	
-	public static boolean isFiltered (JdbcTemplate jdbcTemplate) {
-		if (jdbcTemplate.queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
-		else return true;
+//	public static boolean isFiltered (JdbcTemplate jdbcTemplate) {
+//		if (jdbcTemplate.queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
+//		else return true;
+//	}
+	
+	public static int isFiltered (JdbcTemplate jdbcTemplate) {
+		return jdbcTemplate.queryForObject(CommonSql.findFilter, Integer.class);
 	}
 	
 	
 	// dq->ddq limit filter ����
 	
-	public static boolean isSQLi (String FQ, String DQ) {
-		
+	public static boolean isSQLiR (String FQ, String DQ) {
+		logger.info("executing reg filter");
 		logger.info("fq : {}", FQ);
 		logger.info("dq : {}", DQ);
 		
@@ -47,9 +51,6 @@ public class SqlInjectionFilter {
 		byte[] result = new byte[FdqBytes.length]; 
 		boolean check = false;
 		
-		// �̷��� �ϴ°� ������, �׳� string compare�ϴ°� ������ �� �𸣰ڴ�.
-		// �����ϱ�δ� string compare�� ������.
-		// byte �迭�� ���̸� �̿��ص� ����.
 		for (int i = 0;;++i) {
 			if (i < FdqBytes.length && i < DdqBytes.length) {
 				result[i] = (byte)(FdqBytes[i] ^ DdqBytes[i]);
@@ -64,16 +65,49 @@ public class SqlInjectionFilter {
 			
 		}
 		
-		//	check true -> abnormal sql
-		//	check false -> normal sql
-		//	return true -> abnormal sql
-		//	return false -> normal sql
 		if (check) {
 			logger.info("abnormal sql");
 			return true;
 		}
 		logger.info("normal sql");
 		return false;
+	}
+	
+	public static boolean isSQLiQ (String FQ, String DQ) {
+		logger.info("executing quotation filter");
+		String Fdq = null;
+		String Ddq = null;
+		
+//		Fdq = removeAttr(FQ);
+		Fdq = FQ.replace("?", "");
+		Ddq = removeAttr(DQ);
+		
+		logger.info("Fdq : {}", Fdq);
+		logger.info("Ddq : {}", Ddq);
+		
+		if (Fdq.compareTo(Ddq) == 0) {
+			return false;
+		} else return true;
+		
+	}
+	
+	private static String removeAttr (String query) {
+		boolean quote = false;
+		String result = "";
+		
+		for (int i = 0;i < query.length();++i) {
+			char ch = query.charAt(i);
+			
+			if (!quote && ch == '\'') {
+				quote = true;
+			} else if (quote && ch == '\'') {
+				quote = false;
+			} else if (!quote) {
+				result += ch;
+			}
+		}
+		
+		return result;
 	}
 	
 	public static String getBoundSql (String sql, Object[] params) {

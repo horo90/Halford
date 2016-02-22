@@ -57,13 +57,14 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	@Override
-	public boolean findFilter() {
+	public int findFilter() {
 		return loginJdbcTemplate.findFilter();
 	}
 
 	@Override
-	public void updateFilter() {
-		loginJdbcTemplate.updateFilter();
+	public void updateFilter(int filter) {
+		logger.info("service" + filter);
+		loginJdbcTemplate.updateFilter(filter);
 	}
 
 }

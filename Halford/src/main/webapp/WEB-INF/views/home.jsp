@@ -75,15 +75,17 @@
 				<span class="col-sm-4"></span>
 				<div class="col-sm-4">
 					<c:choose>
-						<c:when test="${sessionScope.filter == null || sessionScope.filter == false }">
-							<a href="./filterToggle.do" class="btn btn-success btn-block" role="button">필터 적용</a>
+						<c:when test="${sessionScope.filter == null || sessionScope.filter == 0}">
+							<a href="./filterToggle.do?filter=1" class="btn btn-success btn-block" role="button" id="reg-filter-button">정규식 필터 적용</a>
+							<a href="./filterToggle.do?filter=2" class="btn btn-success btn-block" role="button" id="quote-filter-button">quoatation 필터 적용</a>
 						</c:when>
-						<c:when test="${sessionScope.filter == true }">
-							<a href="./filterToggle.do" class="btn btn-danger btn-block" role="button">필터 해제</a>
+						<c:when test="${sessionScope.filter != null}">
+							<a href="./filterToggle.do?filter=0" class="btn btn-danger btn-block" role="button" id="free-filter-button">필터 해제</a>
 						</c:when>
 					</c:choose>
 				</div>
 			</div>
+			
 		</fieldset>
 	</div>
 </body>

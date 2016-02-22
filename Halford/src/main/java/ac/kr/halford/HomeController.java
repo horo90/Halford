@@ -265,11 +265,25 @@ public class HomeController {
 	@RequestMapping(value = "/filterToggle.do", method = RequestMethod.GET)
 	public String toggleFilter (HttpServletRequest request) {
 		logger.info("toggle");
+		
 		HttpSession session = request.getSession();
 		
-		loginService.updateFilter();
-		boolean filter = loginService.findFilter();
-		session.setAttribute(Messages.filterKey, filter);
+		// if filter is off, 0
+		// if reg filter is on, 1
+		// if quote filter is on, 2
+		try {
+			int filter = Integer.parseInt(request.getParameter("filter"));
+			logger.info(filter + "");
+			loginService.updateFilter(filter);
+			session.setAttribute(Messages.filterKey, filter);
+		} catch (NumberFormatException e) {
+			
+			//
+		}
+		
+//		loginService.updateFilter();
+//		int filter = loginService.findFilter();
+//		session.setAttribute(Messages.filterKey, filter);
 		
 		return "redirect:/";
 	}

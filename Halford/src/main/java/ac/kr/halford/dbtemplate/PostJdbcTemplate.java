@@ -31,9 +31,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -47,9 +47,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -63,9 +63,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			this.getJdbcTemplate().update(dq);
 			return 0;
 		} else return 1;
@@ -79,9 +79,9 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			//if want to get single row, It's correct using queryForObject() method -> only return single row.
 			// but in this case, for developing vulnerable web application, use query() method-> allow return multi rows. 
 			List<PostModel> list = this.getJdbcTemplate().query(dq, new RowMapper<PostModel> () {
@@ -118,9 +118,10 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
+		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {			try {
+		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
+			try {
 				return this.getJdbcTemplate().query(dq, 
 						new RowMapper<PostModel> () {
 
