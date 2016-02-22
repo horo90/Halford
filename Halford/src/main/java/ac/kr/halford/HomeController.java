@@ -68,6 +68,7 @@ public class HomeController {
 	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
 	public String join (@ModelAttribute MemberModel member, HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 		logger.info("join process");
+		logger.info(member.toString());
 		
 		if (loginService.join(member) != 0) {
 			Map<String, Object> map = new HashMap<String, Object>();
@@ -83,6 +84,7 @@ public class HomeController {
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
 	public String login (@ModelAttribute MemberModel member, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
 		logger.info("login process");
+		logger.info(member.toString());
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		member = loginService.login(member);
@@ -90,8 +92,6 @@ public class HomeController {
 		if (member != null) {
 			if (!member.isEmpty()) {
 				logger.info("loing success");
-//				map.put("isSqli", false);
-//				redirectAttributes.addFlashAttribute("map", map);
 				return "redirect:/boardPage.do";
 			} else {
 				logger.info("login failed");
@@ -265,15 +265,11 @@ public class HomeController {
 	@RequestMapping(value = "/filterToggle.do", method = RequestMethod.GET)
 	public String toggleFilter (HttpServletRequest request) {
 		logger.info("toggle");
-		
 		HttpSession session = request.getSession();
 		
-		if (session.getAttribute(Messages.filterKey) == null) session.setAttribute(Messages.filterKey, false);
-		
-		boolean filter = (Boolean) session.getAttribute(Messages.filterKey);
-		
-		if (filter) session.setAttribute(Messages.filterKey, false);
-		else session.setAttribute(Messages.filterKey, true);
+		loginService.updateFilter();
+		boolean filter = loginService.findFilter();
+		session.setAttribute(Messages.filterKey, filter);
 		
 		return "redirect:/";
 	}

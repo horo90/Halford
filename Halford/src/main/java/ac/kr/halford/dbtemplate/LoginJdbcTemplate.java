@@ -4,15 +4,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
+import ac.kr.halford.constants.CommonSql;
 import ac.kr.halford.constants.LoginSql;
 import ac.kr.halford.model.MemberModel;
 
@@ -20,8 +17,6 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 	
 	
 	private static Logger logger = LoggerFactory.getLogger(LoginJdbcTemplate.class);
-	
-	
 
 	@Override
 	public int addMember(MemberModel member) {
@@ -31,7 +26,7 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
@@ -48,13 +43,13 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		logger.info("filter : {}", filter);
 		
-		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
+		if (dq != null && (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq)))) {
 			
-			
-			List<MemberModel> list = this.getJdbcTemplate().query(dq, new RowMapper<MemberModel> () {
+//			try {
+				List<MemberModel> list = this.getJdbcTemplate().query(dq, new RowMapper<MemberModel> () {
 					
 					@Override
 					public MemberModel mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -63,18 +58,33 @@ public class LoginJdbcTemplate extends JdbcDaoSupport implements LoginDAO {
 						return member;
 					}
 
-			});
-			
-			if (list.size() == 0) {
-				member = new MemberModel();
-				member.setEmpty(true);
-				return member;
-			} else {
-				return list.get(0);
-			}
-			
+				});
+				
+				if (list.size() == 0) {
+					member = new MemberModel();
+					member.setEmpty(true);
+					return member;
+				} else {
+					return list.get(0);
+				}
+//			} catch (BadSqlGrammarException e) {return null;}
 		} else return null;
 		
+		
+	}
+
+	@Override
+	public boolean findFilter() {
+		
+		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
+		else return true;
+	}
+
+	@Override
+	public void updateFilter() {
+		if (this.getJdbcTemplate().queryForObject(CommonSql.findFilter, Integer.class) == 0) {
+			this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {1});
+		} else this.getJdbcTemplate().update(CommonSql.updateFilter, new Object[] {0});
 		
 	}
 

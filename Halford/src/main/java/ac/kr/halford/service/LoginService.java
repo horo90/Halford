@@ -6,4 +6,7 @@ public interface LoginService {
 	public int join(MemberModel member);
 	public MemberModel login(MemberModel member);
 	public void logout ();
+	
+	public boolean findFilter ();
+	public void updateFilter();
 }

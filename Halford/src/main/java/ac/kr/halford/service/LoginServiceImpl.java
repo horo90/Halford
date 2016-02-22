@@ -56,4 +56,14 @@ public class LoginServiceImpl implements LoginService {
 		session.setAttribute(Messages.idKey, null);
 	}
 
+	@Override
+	public boolean findFilter() {
+		return loginJdbcTemplate.findFilter();
+	}
+
+	@Override
+	public void updateFilter() {
+		loginJdbcTemplate.updateFilter();
+	}
+
 }

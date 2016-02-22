@@ -31,7 +31,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
@@ -47,7 +47,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
@@ -63,7 +63,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			this.getJdbcTemplate().update(dq);
@@ -79,7 +79,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {
 			//if want to get single row, It's correct using queryForObject() method -> only return single row.
@@ -118,7 +118,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		logger.info(dq);
 		
-		boolean filter = SqlInjectionFilter.isFiltered();
+		boolean filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
 		if (!filter || (filter && !SqlInjectionFilter.isSQLi(fq, dq))) {			try {
 				return this.getJdbcTemplate().query(dq, 

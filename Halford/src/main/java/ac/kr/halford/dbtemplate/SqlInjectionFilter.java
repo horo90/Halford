@@ -1,13 +1,10 @@
 package ac.kr.halford.dbtemplate;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import ac.kr.halford.constants.Messages;
+import ac.kr.halford.constants.CommonSql;
 
 public class SqlInjectionFilter {
 	
@@ -20,15 +17,9 @@ public class SqlInjectionFilter {
 	private static final String quotesFilter = "'([^']*)'";
 	private static final String NumEqNumFilter = "[+-]?(\\d*)(\\.\\d*)?=[+-]?(\\d*)(\\.\\d*)?";
 	
-	public static boolean isFiltered () {
-		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-		
-		HttpSession session = attr.getRequest().getSession();
-		if (session.getAttribute(Messages.filterKey) == null) {
-			session.setAttribute(Messages.filterKey, false);
-		}
-		
-		return (Boolean) session.getAttribute(Messages.filterKey);
+	public static boolean isFiltered (JdbcTemplate jdbcTemplate) {
+		if (jdbcTemplate.queryForObject(CommonSql.findFilter, Integer.class) == 0) return false;
+		else return true;
 	}
 	
 	
@@ -87,11 +78,11 @@ public class SqlInjectionFilter {
 	
 	public static String getBoundSql (String sql, Object[] params) {
 		
-		// params�� model class�� Map class�� �ִ� �Ӽ��� object �迭�� �ٲٱ� ������ String or ���� �迭 ���̴�.
-		// �̷������� �Ϸ��� ���� Map�̳� Model class�� ����� �ʿ�� ������, mybatis ��ݿ��� �ٲٴ� ���� �̷� ���°� �ƴ�.
 		if (params.length > 0) {
 			for (Object value : params) {
-				if (value.getClass() == String.class) {
+				if (value == null) {
+					return null;
+				} else if (value.getClass() == String.class) {
 					sql = sql.replaceFirst("\\?", "'"+value.toString()+"'");
 				} else {
 					sql = sql.replaceFirst("\\?", value.toString());
