@@ -14,10 +14,10 @@
 		<li><a href="./logout.do">Logout</a></li>
 		<li><a>
 			<c:choose>
-				<c:when test="${sessionScope.filter }">
+				<c:when test="${sessionScope.filter != 0 }">
 					<span class="glyphicon glyphicon-ok-circle"></span>
 				</c:when>
-				<c:when test="${!sessionScope.filter }">
+				<c:when test="${sessionScope.filter == 0 }">
 					<span class="glyphicon glyphicon-remove-circle"></span>
 				</c:when>
 			</c:choose>

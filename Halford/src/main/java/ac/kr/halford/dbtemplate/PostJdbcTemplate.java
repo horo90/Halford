@@ -106,7 +106,8 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 				return list.get(0);
 			}
 			
-		} else return null;
+//		} else return null;
+		} else return new PostModel();
 	}
 
 	@Override
@@ -120,7 +121,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 		
 		int filter = SqlInjectionFilter.isFiltered(this.getJdbcTemplate());
 		
-		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
+//		if (dq != null && (filter == 0 || ((filter == 1 && !SqlInjectionFilter.isSQLiR(fq, dq)) || (filter == 2 && !SqlInjectionFilter.isSQLiQ(fq, dq))))) {
 			try {
 				return this.getJdbcTemplate().query(dq, 
 						new RowMapper<PostModel> () {
@@ -142,7 +143,7 @@ public class PostJdbcTemplate extends JdbcDaoSupport implements PostDAO {
 				
 				return new ArrayList<PostModel>();
 			}
-		} else return null;
+//		} else return null;
 	}
 
 	@Override

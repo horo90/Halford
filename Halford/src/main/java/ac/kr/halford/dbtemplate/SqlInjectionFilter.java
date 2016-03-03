@@ -78,8 +78,11 @@ public class SqlInjectionFilter {
 		String Fdq = null;
 		String Ddq = null;
 		
+		logger.info("fq : {}", FQ);
+		logger.info("dq : {}", DQ);
+		
 //		Fdq = removeAttr(FQ);
-		Fdq = FQ.replace("?", "");
+		Fdq = FQ.replaceAll("\\?", "");
 		Ddq = removeAttr(DQ);
 		
 		logger.info("Fdq : {}", Fdq);
@@ -98,10 +101,13 @@ public class SqlInjectionFilter {
 		for (int i = 0;i < query.length();++i) {
 			char ch = query.charAt(i);
 			
-			if (!quote && ch == '\'') {
-				quote = true;
-			} else if (quote && ch == '\'') {
-				quote = false;
+			if (ch == '\'') {
+				if (quote) {
+					quote = false;
+				} else {
+					quote = true;
+				}
+				result += ch;
 			} else if (!quote) {
 				result += ch;
 			}
